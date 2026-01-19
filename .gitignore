@@ -23,7 +23,19 @@
 # misc
 .DS_Store
 *.pem
-BACKEND_API_SPEC.md
+
+# IDE / Editor
+.vscode/
+.idea/
+*.swp
+*.swo
+*.swn
+.vim/
+
+# OS specific
+Thumbs.db
+Desktop.ini
+*~
 
 # debug
 npm-debug.log*
@@ -37,6 +49,23 @@ yarn-error.log*
 # vercel
 .vercel
 
+# Firebase
+.firebase/
+firebase-debug.log
+firestore-debug.log
+ui-debug.log
+
+# Build artifacts
+dist/
+.turbo/
+
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Documentation
+*.md
+!README.md
+
+# Agent internal
+.agent/
