@@ -86,7 +86,7 @@ export function VerseExamples({ arabicWord }: VerseExamplesProps) {
 
   return (
     <div className="space-y-4">
-      <h3 className="text-sm font-semibold text-muted-foreground uppercase tracking-wider text-center">
+      <h3 className="text-sm font-bold text-foreground opacity-50 uppercase tracking-wider text-center">
         Usage Examples
       </h3>
       {examples.map((ex, idx) => (
@@ -95,7 +95,7 @@ export function VerseExamples({ arabicWord }: VerseExamplesProps) {
             
             {/* Arabic Text */}
             <p 
-              className="text-xl font-arabic leading-loose text-right text-foreground/90" 
+              className="text-xl font-arabic leading-loose text-right opacity-70 text-foreground/90" 
               dir="rtl"
             >
               {ex.text_uthmani || ex.text}
@@ -105,7 +105,7 @@ export function VerseExamples({ arabicWord }: VerseExamplesProps) {
 
             {/* Translation & Reference */}
             <div className="flex flex-col gap-1">
-               <p className="text-sm text-muted-foreground italic">
+               <p className="text-sm text-foreground italic leading-relaxed opacity-90">
                  "{(() => {
                     if (ex.translations && ex.translations.length > 0) return ex.translations[0].text;
                     // Fallback to word-by-word

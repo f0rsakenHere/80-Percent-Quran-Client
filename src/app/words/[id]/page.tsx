@@ -84,12 +84,12 @@ export default function WordDetailsPage() {
 
       {/* Hero Card */}
       <div className="relative">
-        <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full opacity-50 pointer-events-none" />
+        <div className="absolute inset-0 bg-primary/10 blur-3xl rounded-full opacity-100 pointer-events-none" />
         <Card className="relative p-8 flex flex-col items-center justify-center border-primary/20 bg-card/50 backdrop-blur-sm overflow-hidden">
              
              {/* Decorative */}
              <div className="absolute top-0 right-0 p-4 opacity-10">
-               <BookOpen className="w-24 h-24" />
+               <BookOpen className="w-10 h-10" />
              </div>
 
              <div className="space-y-2 text-center z-10">
@@ -108,14 +108,14 @@ export default function WordDetailsPage() {
       {/* Stats Grid */}
       <div className="grid grid-cols-2 gap-4">
         <Card className="p-4 flex flex-col items-center justify-center bg-muted/20 border-border/50">
-           <BarChart3 className="w-5 h-5 text-muted-foreground mb-2" />
-           <span className="text-xl font-bold font-mono">{word.frequency.toLocaleString()}</span>
-           <span className="text-xs text-muted-foreground uppercase">Occurrences</span>
+           <BarChart3 className="w-5 h-5 text-primary mb-2" />
+           <span className="text-xl font-bold font-mono opacity-70">{word.frequency.toLocaleString()}</span>
+           <span className="text-xs text-foreground uppercase tracking-wide font-medium">Occurrences</span>
         </Card>
         <Card className="p-4 flex flex-col items-center justify-center bg-muted/20 border-border/50">
-           <Tag className="w-5 h-5 text-muted-foreground mb-2" />
-           <span className="text-xl font-bold font-mono">#{word.id}</span>
-           <span className="text-xs text-muted-foreground uppercase">Rank</span>
+           <Tag className="w-5 h-5 text-accent mb-2" />
+           <span className="text-xl font-bold font-mono opacity-70">#{word.id}</span>
+           <span className="text-xs text-foreground uppercase tracking-wide font-medium">Rank</span>
         </Card>
       </div>
 
