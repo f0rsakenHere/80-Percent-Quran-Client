@@ -20,6 +20,52 @@ export default function DashboardOverview() {
   const router = useRouter();
   const [stats, setStats] = useState<UserStats | null>(null);
   const [loading, setLoading] = useState(true);
+  const [dailyProgress, setDailyProgress] = useState({ count: 0, date: new Date().toDateString() });
+
+  // Track daily progress
+  useEffect(() => {
+    const stored = localStorage.getItem('dailyProgress');
+    const today = new Date().toDateString();
+    
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      // Reset if it's a new day
+      if (parsed.date !== today) {
+        const newProgress = { count: 0, date: today };
+        setDailyProgress(newProgress);
+        localStorage.setItem('dailyProgress', JSON.stringify(newProgress));
+      } else {
+        setDailyProgress(parsed);
+      }
+    } else {
+      const newProgress = { count: 0, date: today };
+      localStorage.setItem('dailyProgress', JSON.stringify(newProgress));
+    }
+  }, []);
+
+  // Update daily progress when words are learned
+  useEffect(() => {
+    if (stats?.totalWordsLearned) {
+      const stored = localStorage.getItem('dailyProgress');
+      const today = new Date().toDateString();
+      
+      if (stored) {
+        const parsed = JSON.parse(stored);
+        const prevTotal = parseInt(localStorage.getItem('prevTotalWords') || '0');
+        
+        // If total increased, update daily count
+        if (stats.totalWordsLearned > prevTotal) {
+          const increase = stats.totalWordsLearned - prevTotal;
+          const newCount = parsed.date === today ? parsed.count + increase : increase;
+          const newProgress = { count: newCount, date: today };
+          setDailyProgress(newProgress);
+          localStorage.setItem('dailyProgress', JSON.stringify(newProgress));
+        }
+        
+        localStorage.setItem('prevTotalWords', stats.totalWordsLearned.toString());
+      }
+    }
+  }, [stats?.totalWordsLearned]);
 
   useEffect(() => {
     async function fetchStats() {
@@ -252,12 +298,35 @@ export default function DashboardOverview() {
           <div className="flex justify-between items-center mb-2">
             <div>
                <h3 className="font-semibold text-sm">Daily Goal</h3>
-               <p className="text-[10px] text-muted-foreground">Keep up your 5-day streak!</p>
+               <p className="text-[10px] text-muted-foreground">
+                 {(() => {
+                   const dailyGoal = 20;
+                   const wordsLearnedToday = dailyProgress.count;
+                   const remaining = Math.max(0, dailyGoal - wordsLearnedToday);
+                   
+                   if (wordsLearnedToday >= dailyGoal) {
+                     return "🎉 Goal completed! Keep it up!";
+                   } else if (wordsLearnedToday === 0) {
+                     return "Start your daily learning journey!";
+                   } else if (remaining === 1) {
+                     return "Just 1 more word to go!";
+                   } else if (remaining <= 5) {
+                     return `Almost there! ${remaining} words left`;
+                   } else {
+                     return `${remaining} words left today`;
+                   }
+                 })()}
+               </p>
             </div>
-            <span className="text-xs font-bold text-primary">3 / 5 words</span>
+            <span className="text-xs font-bold text-primary">
+              {Math.min(dailyProgress.count, 20)} / 20 words
+            </span>
           </div>
           <div className="h-2 w-full bg-background rounded-full overflow-hidden">
-            <div className="h-full bg-primary w-[60%] rounded-full" />
+            <div 
+              className="h-full bg-primary rounded-full transition-all duration-500" 
+              style={{ width: `${Math.min((dailyProgress.count / 20) * 100, 100)}%` }}
+            />
           </div>
         </Card>
       </motion.div>
