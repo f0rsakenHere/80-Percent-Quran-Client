@@ -43,7 +43,7 @@ export default function WordDetailsPage() {
 
   if (loading) {
      return (
-       <div className="container max-w-md mx-auto p-4 space-y-6">
+       <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
          <div className="flex items-center gap-4 mb-8">
            <Skeleton className="h-10 w-10 rounded-full" />
            <Skeleton className="h-8 w-32" />
@@ -56,7 +56,7 @@ export default function WordDetailsPage() {
 
   if (error || !word) {
     return (
-      <div className="container max-w-md mx-auto p-4 flex flex-col items-center justify-center h-[60vh] space-y-4">
+      <div className="w-full max-w-2xl mx-auto p-4 flex flex-col items-center justify-center h-[60vh] space-y-4">
         <p className="text-muted-foreground">{error || 'Word not found'}</p>
         <Button variant="outline" onClick={() => router.back()}>
           <ArrowLeft className="w-4 h-4 mr-2" />
@@ -67,7 +67,7 @@ export default function WordDetailsPage() {
   }
 
   return (
-    <div className="container max-w-md mx-auto p-4 pb-20 space-y-6 animate-fade-in">
+    <div className="w-full max-w-2xl mx-auto p-4 pb-20 space-y-6 animate-fade-in">
       
       {/* Header */}
       <div className="flex items-center gap-2">
