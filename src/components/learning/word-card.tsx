@@ -34,7 +34,7 @@ export function WordCard({ word, isFlipped, onFlip, className }: WordCardProps) 
       >
         {/* FRONT FACING (Arabic) */}
         <div 
-          className="absolute w-full h-full"
+          className="absolute w-full h-full [backface-visibility:hidden]"
           style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
         >
           <Card className="w-full h-full flex flex-col items-center justify-center p-8 bg-card border-primary/20 shadow-xl relative overflow-hidden group">
@@ -65,7 +65,7 @@ export function WordCard({ word, isFlipped, onFlip, className }: WordCardProps) 
 
         {/* BACK FACING (Details) */}
         <div 
-          className="absolute w-full h-full"
+          className="absolute w-full h-full [backface-visibility:hidden]"
           style={{ 
             backfaceVisibility: 'hidden', 
             WebkitBackfaceVisibility: 'hidden',

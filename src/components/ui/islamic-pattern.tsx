@@ -63,11 +63,11 @@ export function IslamicPattern() {
         <rect width="200" height="200" fill="url(#mandala)" />
       </svg>
 
-      {/* Calligraphy Elements - Smaller and more subtle */}
-      <div className="absolute top-8 left-8 text-primary/[0.1] font-arabic text-4xl rotate-[-15deg] select-none">
+      {/* Calligraphy Elements - Hidden on mobile, visible on desktop */}
+      <div className="hidden md:block absolute top-8 left-8 text-primary/[0.1] font-arabic text-4xl rotate-[-15deg] select-none">
         ﷽
       </div>
-      <div className="absolute bottom-16 right-8 text-accent/[0.12] font-arabic text-3xl rotate-12 select-none">
+      <div className="hidden md:block absolute bottom-16 right-8 text-accent/[0.12] font-arabic text-3xl rotate-12 select-none">
         ٱللَّٰهُ
       </div>
     </div>

@@ -104,7 +104,7 @@ export default function ProgressPage() {
   }
 
   return (
-    <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
+    <div className="w-full max-w-2xl mx-auto p-4 space-y-6 pb-24">
       
       {/* Header */}
       <motion.div 
