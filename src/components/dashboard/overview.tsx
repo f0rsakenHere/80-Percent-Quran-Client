@@ -83,10 +83,10 @@ export default function DashboardOverview() {
             quranCoveragePercentage: 15.5,
             progressPercentage: 12,
             recentlyLearned: [
-              { id: 1, arabic: 'ٱللَّهِ', translation: 'Allah', transliteration: 'Allah', frequency: 2699 },
-              { id: 2, arabic: 'مِن', translation: 'From', transliteration: 'Min', frequency: 3226 },
-              { id: 3, arabic: 'إِلَىٰ', translation: 'To', transliteration: 'Ila', frequency: 742 },
-              { id: 4, arabic: 'عَلَىٰ', translation: 'On', transliteration: 'Ala', frequency: 670 },
+              { id: 4, arabic: 'اللَّهِ', translation: 'Allah', transliteration: 'Allāh', frequency: 940 },
+              { id: 1, arabic: 'مِنْ', translation: 'From', transliteration: 'Min', frequency: 1673 },
+              { id: 17, arabic: 'إِلَى', translation: 'To', transliteration: 'Ilā', frequency: 405 },
+              { id: 9, arabic: 'عَلَى', translation: 'On', transliteration: 'ʿAlā', frequency: 670 },
             ]
           });
         } else {

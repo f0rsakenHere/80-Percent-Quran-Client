@@ -42,9 +42,9 @@ export default function ProgressPage() {
              recentlyLearned: []
            });
            setLearnedWords([
-             { _id: '1', id: 1, arabic: 'ٱللَّهِ', translation: 'Allah', transliteration: 'Allah', frequency: 2699, type: 'Noun', createdAt: '', updatedAt: '' },
-             { _id: '2', id: 2, arabic: 'مِن', translation: 'From', transliteration: 'Min', frequency: 3226, type: 'Preposition', createdAt: '', updatedAt: '' },
-             { _id: '3', id: 3, arabic: 'إِلَىٰ', translation: 'To', transliteration: 'Ila', frequency: 742, type: 'Preposition', createdAt: '', updatedAt: '' },
+             { _id: '4', id: 4, arabic: 'اللَّهِ', translation: 'Allah', transliteration: 'Allāh', frequency: 940, type: 'Noun', createdAt: '', updatedAt: '' },
+             { _id: '1', id: 1, arabic: 'مِنْ', translation: 'From', transliteration: 'Min', frequency: 1673, type: 'Noun', createdAt: '', updatedAt: '' },
+             { _id: '17', id: 17, arabic: 'إِلَى', translation: 'To', transliteration: 'Ilā', frequency: 405, type: 'Noun', createdAt: '', updatedAt: '' },
            ]);
         } else {
            // Real API

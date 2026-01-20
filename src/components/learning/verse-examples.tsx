@@ -177,7 +177,13 @@ export function VerseExamples({ arabicWord }: VerseExamplesProps) {
             <div className="flex flex-col gap-1">
                <p className="text-sm text-foreground italic leading-relaxed opacity-90">
                  "{(() => {
-                    if (ex.translations && ex.translations.length > 0) return ex.translations[0].text;
+                    if (ex.translations && ex.translations.length > 0) {
+                        // Remove HTML tags if present and remove footnote numbers
+                        return ex.translations[0].text
+                            .replace(/<[^>]*>/g, '') // remove HTML
+                            .replace(/(\d+)/g, '')   // remove numbers/footnotes
+                            .trim();
+                    }
                     // Fallback to word-by-word
                     const anyEx = ex as any; 
                     if (anyEx.words && anyEx.words.length > 0) {
@@ -185,7 +191,9 @@ export function VerseExamples({ arabicWord }: VerseExamplesProps) {
                           .map((w: any) => w.translation?.text)
                           .filter(Boolean)
                           .join(' ')
-                          .replace(/[\(\)\[\]]/g, '');
+                          .replace(/[\(\)\[\]]/g, '')
+                          .replace(/(\d+)/g, '') // remove numbers
+                          .trim();
                     }
                     return '';
                  })()}"
