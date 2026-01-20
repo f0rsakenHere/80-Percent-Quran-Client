@@ -7,10 +7,19 @@ export default function Home() {
   return (
     <ProtectedRoute>
       <div className="min-h-screen bg-background p-4 md:p-8">
-        {/* Background decoration */}
+        {/* Background Image - Calligraphy Vortex */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none fixed">
-          <div className="absolute top-0 -left-1/4 w-[500px] h-[500px] bg-primary/5 rounded-full blur-[100px]" />
-          <div className="absolute bottom-0 -right-1/4 w-[500px] h-[500px] bg-accent/5 rounded-full blur-[100px]" />
+          <div 
+            className="absolute inset-0 opacity-[0.06] dark:opacity-[0.10]"
+            style={{
+              backgroundImage: 'url(/bg-pattern.jpg)',
+              backgroundSize: '150%',
+              backgroundPosition: 'center',
+              backgroundRepeat: 'no-repeat',
+            }}
+          />
+          {/* Subtle gradient overlay */}
+          <div className="absolute inset-0 bg-gradient-to-b from-background/70 via-background/50 to-background/70" />
         </div>
 
         {/* Content */}
