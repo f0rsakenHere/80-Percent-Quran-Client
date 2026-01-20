@@ -8,7 +8,7 @@ import { getUserStats } from '@/lib/api/progress';
 import { UserStats } from '@/types';
 import { ProgressRing } from '@/components/ui/progress-ring';
 import { StatCard } from '@/components/ui/stat-card';
-import { FloatingActionButton } from '@/components/ui/fab';
+
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
 import { BookOpen, TrendingUp, Clock, ArrowRight, Play } from 'lucide-react';
@@ -220,7 +220,10 @@ export default function DashboardOverview() {
               <Card 
                 key={word.id}
                 className="min-w-[120px] p-3 flex flex-col items-center gap-1 bg-card/40 hover:bg-card/60 transition-colors border-border/50 snap-center cursor-pointer"
-                onClick={() => router.push(`/words/${word.id}`)}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  router.push(`/words/${word.id}`);
+                }}
               >
                 <div className="font-arabic text-2xl text-primary">{word.arabic}</div>
                 <div className="text-xs font-medium">{word.translation}</div>
@@ -259,12 +262,7 @@ export default function DashboardOverview() {
         </Card>
       </motion.div>
 
-      {/* Floating Action Button */}
-      <FloatingActionButton 
-        icon={<Play className="w-6 h-6 ml-1 fill-current" />} 
-        label="Continue Learning"
-        onClick={() => router.push('/learn')}
-      />
+
     </div>
   );
 }
