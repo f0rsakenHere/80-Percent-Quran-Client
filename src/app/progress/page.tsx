@@ -193,41 +193,65 @@ export default function ProgressPage() {
             <span className="text-xs text-muted-foreground">{learnedWords.length} words</span>
         </div>
         
-        {/* List */}
-        <div className="space-y-3">
-           {learnedWords.length === 0 ? (
+         {/* List */}
+         <div className="space-y-3">
+            {learnedWords.length === 0 ? (
                <Card className="p-8 flex flex-col items-center justify-center text-center space-y-3 bg-muted/20 border-border/50">
                   <BookOpen className="w-10 h-10 text-muted-foreground/50" />
                   <p className="text-muted-foreground text-sm">You haven't learned any words yet.</p>
                   <Button onClick={() => router.push('/learn')} variant="outline">Start Learning</Button>
                </Card>
-           ) : (
-             learnedWords.map((word) => (
-                <Card 
-                  key={word.id} 
-                  className="p-3 flex items-center justify-between hover:bg-muted/30 transition-colors cursor-pointer group"
-                  onClick={() => router.push(`/words/${word.id}`)}
-                >
-                   <div className="flex items-center gap-4">
-                      <div className="w-12 h-12 rounded-full bg-primary/10 flex items-center justify-center font-arabic text-xl pb-1 text-primary">
-                        {word.arabic}
+            ) : (
+              learnedWords.map((word, index) => (
+                 <motion.div
+                   key={word.id}
+                   initial={{ opacity: 0, y: 20 }}
+                   animate={{ opacity: 1, y: 0 }}
+                   transition={{ delay: index * 0.05 }}
+                 >
+                   <Card 
+                     className="p-4 hover:shadow-lg hover:border-primary/30 transition-all duration-300 cursor-pointer group relative overflow-hidden"
+                     onClick={() => router.push(`/words/${word.id}`)}
+                   >
+                      {/* Background gradient on hover */}
+                      <div className="absolute inset-0 bg-gradient-to-r from-primary/5 to-accent/5 opacity-0 group-hover:opacity-100 transition-opacity" />
+                      
+                      <div className="flex items-center gap-4 relative z-10">
+                        {/* Arabic Circle - Larger & More Prominent */}
+                        <div className="relative">
+                          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/20 to-primary/10 flex items-center justify-center border border-primary/20 group-hover:border-primary/40 transition-all group-hover:scale-105">
+                            <span className="font-arabic text-2xl text-primary drop-shadow-sm">
+                              {word.arabic}
+                            </span>
+                          </div>
+                        </div>
+                        
+                        {/* Content - Better Typography */}
+                        <div className="flex-1 min-w-0">
+                          <h3 className="font-semibold text-base text-foreground group-hover:text-primary transition-colors">
+                            {word.translation}
+                          </h3>
+                          <p className="text-sm text-muted-foreground italic mt-0.5">
+                            /{word.transliteration}/
+                          </p>
+                        </div>
+                        
+                        {/* Frequency Badge - Premium Design */}
+                        <div className="flex items-center gap-2">
+                          <div className="flex flex-col items-end">
+                            <span className="text-[10px] text-muted-foreground uppercase tracking-wider font-medium">Freq</span>
+                            <span className="text-sm font-bold text-foreground font-mono bg-primary/10 px-2 py-0.5 rounded-md">
+                              {formatNumber(word.frequency)}
+                            </span>
+                          </div>
+                          <ArrowRight className="w-5 h-5 text-primary opacity-0 group-hover:opacity-100 group-hover:translate-x-1 transition-all" />
+                        </div>
                       </div>
-                      <div>
-                        <p className="font-semibold text-sm">{word.translation}</p>
-                        <p className="text-xs text-muted-foreground italic">/{word.transliteration}/</p>
-                      </div>
-                   </div>
-                   <div className="flex items-center gap-3">
-                      <div className="text-right hidden sm:block">
-                        <p className="text-[10px] text-muted-foreground uppercase tracking-wider">Freq</p>
-                        <p className="text-xs font-mono font-bold">{formatNumber(word.frequency)}</p>
-                      </div>
-                      <ArrowRight className="w-4 h-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
-                   </div>
-                </Card>
-             ))
-           )}
-        </div>
+                   </Card>
+                 </motion.div>
+              ))
+            )}
+         </div>
         
         {/* Simple Pagination */}
         {hasMore && !user?.isAnonymous && (
