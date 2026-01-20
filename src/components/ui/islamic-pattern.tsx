@@ -1,20 +1,20 @@
 export function IslamicPattern() {
   return (
-    <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-[0.08] dark:opacity-[0.12]">
+    <div className="fixed inset-0 pointer-events-none overflow-hidden opacity-[0.05] dark:opacity-[0.08]">
       {/* Top Right Geometric Pattern */}
       <svg 
-        className="absolute -top-10 -right-10 w-[300px] h-[300px] text-primary"
+        className="absolute -top-5 -right-5 w-[180px] h-[180px] text-primary"
         viewBox="0 0 200 200"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <pattern id="islamic-star" x="0" y="0" width="25" height="25" patternUnits="userSpaceOnUse">
+          <pattern id="islamic-star" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
             <path 
-              d="M12.5,0 L14.5,10 L24.5,12.5 L14.5,15 L12.5,25 L10.5,15 L0,12.5 L10.5,10 Z" 
+              d="M10,0 L11.5,8 L19.5,10 L11.5,12 L10,20 L8.5,12 L0,10 L8.5,8 Z" 
               fill="currentColor"
-              fillOpacity="0.6"
+              fillOpacity="0.5"
             />
-            <circle cx="12.5" cy="12.5" r="1.5" fill="currentColor" fillOpacity="0.8" />
+            <circle cx="10" cy="10" r="1" fill="currentColor" fillOpacity="0.6" />
           </pattern>
         </defs>
         <rect width="200" height="200" fill="url(#islamic-star)" />
@@ -22,16 +22,16 @@ export function IslamicPattern() {
 
       {/* Bottom Left Arabesque Pattern */}
       <svg 
-        className="absolute -bottom-10 -left-10 w-[250px] h-[250px] text-accent rotate-45"
+        className="absolute -bottom-5 -left-5 w-[150px] h-[150px] text-accent rotate-45"
         viewBox="0 0 200 200"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <pattern id="arabesque" x="0" y="0" width="30" height="30" patternUnits="userSpaceOnUse">
+          <pattern id="arabesque" x="0" y="0" width="20" height="20" patternUnits="userSpaceOnUse">
             <path 
-              d="M15,3 Q18,9 15,15 Q12,9 15,3 Z M3,15 Q9,18 15,15 Q9,12 3,15 Z M15,27 Q18,21 15,15 Q12,21 15,27 Z M27,15 Q21,12 15,15 Q21,18 27,15 Z" 
+              d="M10,2 Q12,6 10,10 Q8,6 10,2 Z M2,10 Q6,12 10,10 Q6,8 2,10 Z M10,18 Q12,14 10,10 Q8,14 10,18 Z M18,10 Q14,8 10,10 Q14,12 18,10 Z" 
               fill="currentColor"
-              fillOpacity="0.5"
+              fillOpacity="0.4"
             />
           </pattern>
         </defs>
@@ -40,34 +40,34 @@ export function IslamicPattern() {
 
       {/* Center Mandala Pattern */}
       <svg 
-        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] text-primary"
+        className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[250px] h-[250px] text-primary"
         viewBox="0 0 200 200"
         xmlns="http://www.w3.org/2000/svg"
       >
         <defs>
-          <pattern id="mandala" x="0" y="0" width="60" height="60" patternUnits="userSpaceOnUse">
+          <pattern id="mandala" x="0" y="0" width="40" height="40" patternUnits="userSpaceOnUse">
             {/* 8-pointed star */}
             <path 
-              d="M30,6 L33,27 L54,30 L33,33 L30,54 L27,33 L6,30 L27,27 Z" 
+              d="M20,4 L22,18 L36,20 L22,22 L20,36 L18,22 L4,20 L18,18 Z" 
               fill="currentColor"
-              fillOpacity="0.3"
+              fillOpacity="0.2"
               stroke="currentColor"
-              strokeWidth="0.3"
-              strokeOpacity="0.4"
+              strokeWidth="0.2"
+              strokeOpacity="0.3"
             />
             {/* Inner circle */}
-            <circle cx="30" cy="30" r="12" fill="none" stroke="currentColor" strokeWidth="0.3" strokeOpacity="0.4" />
-            <circle cx="30" cy="30" r="9" fill="none" stroke="currentColor" strokeWidth="0.3" strokeOpacity="0.3" />
+            <circle cx="20" cy="20" r="8" fill="none" stroke="currentColor" strokeWidth="0.2" strokeOpacity="0.3" />
+            <circle cx="20" cy="20" r="6" fill="none" stroke="currentColor" strokeWidth="0.2" strokeOpacity="0.2" />
           </pattern>
         </defs>
         <rect width="200" height="200" fill="url(#mandala)" />
       </svg>
 
-      {/* Calligraphy Elements - Bismillah styled decorative */}
-      <div className="absolute top-10 left-10 text-primary/[0.15] font-arabic text-6xl rotate-[-15deg] select-none">
+      {/* Calligraphy Elements - Smaller and more subtle */}
+      <div className="absolute top-8 left-8 text-primary/[0.1] font-arabic text-4xl rotate-[-15deg] select-none">
         ﷽
       </div>
-      <div className="absolute bottom-20 right-10 text-accent/[0.2] font-arabic text-5xl rotate-12 select-none">
+      <div className="absolute bottom-16 right-8 text-accent/[0.12] font-arabic text-3xl rotate-12 select-none">
         ٱللَّٰهُ
       </div>
     </div>

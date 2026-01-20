@@ -50,9 +50,26 @@ export default function DashboardOverview() {
             setStats(data.data);
           }
         }
-      } catch (error) {
+      } catch (error: any) {
         console.error('Failed to fetch stats:', error);
-        toast.error('Could not load your progress');
+        
+        // If 404, user has no stats yet (new user). Use defaults silently.
+        if (error.response && error.response.status === 404) {
+          setStats({
+            totalWordsLearned: 0,
+            totalFrequencyKnown: 0,
+            quranCoveragePercentage: 0,
+            progressPercentage: 0,
+            totalAvailableWords: 0,
+            memberSince: new Date().toISOString(),
+            lastActive: new Date().toISOString(),
+            recentlyLearned: []
+          });
+        } 
+        // Only show error toast for real errors (not 404)
+        else {
+          toast.error('Could not load your progress');
+        }
       } finally {
         setLoading(false);
       }

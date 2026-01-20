@@ -26,6 +26,16 @@ export const metadata: Metadata = {
   authors: [{ name: "80% Quran Team" }],
   manifest: "/manifest.json",
   themeColor: "#10b981", // Emerald green
+  icons: {
+    icon: [
+      { url: "/favicon.ico", sizes: "any" },
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+    ],
+    apple: [
+      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+    ],
+  },
   viewport: {
     width: "device-width",
     initialScale: 1,

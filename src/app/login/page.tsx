@@ -4,7 +4,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { motion } from 'framer-motion';
-import { BookOpen, Mail, Lock, Loader2 } from 'lucide-react';
+import { BookOpen, Mail, Lock, Loader2, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
@@ -107,10 +107,8 @@ export default function LoginPage() {
 
         {/* Title */}
         <div className="text-center mb-8 space-y-2">
-          <h1 className="text-3xl font-bold">
-            <span className="bg-gradient-to-r from-primary via-primary to-accent bg-clip-text text-transparent">
-              Welcome to 80% Quran
-            </span>
+          <h1 className="text-3xl font-bold text-foreground">
+            Welcome to 80% Quran
           </h1>
           <p className="text-muted-foreground">
             Sign in to continue your learning journey
@@ -179,9 +177,10 @@ export default function LoginPage() {
               toast.success('Signed in as Guest (Dev Mode)');
             }}
             variant="outline"
-            className="w-full h-11 border-dashed border-primary/40 text-primary hover:bg-primary/10"
+            className="w-full h-11 border-dashed border-primary/40 text-primary hover:bg-primary/10 hover:text-primary transition-colors"
           >
-            👨‍💻 Dev Mode: Guest Login
+            <UserCircle className="w-4 h-4 mr-2" />
+            Dev Mode: Guest Login
           </Button>
 
           {/* Email/Password Form */}
