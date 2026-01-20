@@ -35,7 +35,13 @@ export function WordCard({ word, isFlipped, onFlip, className }: WordCardProps) 
         {/* FRONT FACING (Arabic) */}
         <div 
           className="absolute w-full h-full [backface-visibility:hidden]"
-          style={{ backfaceVisibility: 'hidden', WebkitBackfaceVisibility: 'hidden' }}
+          style={{ 
+            backfaceVisibility: 'hidden', 
+            WebkitBackfaceVisibility: 'hidden',
+            transform: 'rotateY(0deg)',
+            zIndex: isFlipped ? 1 : 2,
+            visibility: isFlipped ? 'hidden' : 'visible'
+          }}
         >
           <Card className="w-full h-full flex flex-col items-center justify-center p-8 bg-card border-primary/20 shadow-xl relative overflow-hidden group">
             <div className="absolute top-0 right-0 p-4 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -69,7 +75,9 @@ export function WordCard({ word, isFlipped, onFlip, className }: WordCardProps) 
           style={{ 
             backfaceVisibility: 'hidden', 
             WebkitBackfaceVisibility: 'hidden',
-            transform: 'rotateY(180deg)' 
+            transform: 'rotateY(180deg)',
+            zIndex: isFlipped ? 2 : 1,
+            visibility: isFlipped ? 'visible' : 'hidden'
           }}
         >
           <Card className="w-full h-full flex flex-col p-5 bg-card border-accent/20 shadow-xl relative overflow-hidden">
