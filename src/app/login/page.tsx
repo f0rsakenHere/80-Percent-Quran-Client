@@ -4,20 +4,15 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@/hooks/use-auth';
 import { motion } from 'framer-motion';
-import { BookOpen, Mail, Lock, Loader2, UserCircle } from 'lucide-react';
+import { BookOpen, Loader2, UserCircle } from 'lucide-react';
 import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
 import { Card } from '@/components/ui/card';
 import { toast } from 'sonner';
 import Image from 'next/image';
 
 export default function LoginPage() {
   const router = useRouter();
-  const { signInWithGoogle, signInWithEmail, signInAsGuest, user } = useAuth();
-  
-  const [email, setEmail] = useState('');
-  const [password, setPassword] = useState('');
-  const [isLoading, setIsLoading] = useState(false);
+  const { signInWithGoogle, signInAsGuest, user } = useAuth();
   const [isGoogleLoading, setIsGoogleLoading] = useState(false);
 
   // Redirect if already logged in (inside useEffect to avoid render-time updates)
@@ -43,36 +38,6 @@ export default function LoginPage() {
       toast.error(error.message || 'Failed to sign in with Google');
     } finally {
       setIsGoogleLoading(false);
-    }
-  };
-
-  const handleEmailSignIn = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!email || !password) {
-      toast.error('Please enter email and password');
-      return;
-    }
-
-    setIsLoading(true);
-    try {
-      await signInWithEmail(email, password);
-      toast.success('Welcome back!');
-      router.push('/');
-    } catch (error: any) {
-      console.error('Email sign-in error:', error);
-      
-      // User-friendly error messages
-      if (error.code === 'auth/user-not-found') {
-        toast.error('No account found with this email');
-      } else if (error.code === 'auth/wrong-password') {
-        toast.error('Incorrect password');
-      } else if (error.code === 'auth/invalid-email') {
-        toast.error('Invalid email address');
-      } else {
-        toast.error(error.message || 'Failed to sign in');
-      }
-    } finally {
-      setIsLoading(false);
     }
   };
 
@@ -116,7 +81,7 @@ export default function LoginPage() {
         </div>
 
         {/* Login Card */}
-        <Card className="p-6 space-y-6 bg-card/50 backdrop-blur-xl border-primary/10">
+        <Card className="p-6 space-y-4 bg-card/50 backdrop-blur-xl border-primary/10">
           {/* Google Sign-In (Primary) */}
           <Button
             onClick={handleGoogleSignIn}
@@ -156,18 +121,6 @@ export default function LoginPage() {
             )}
           </Button>
 
-          {/* Divider */}
-          <div className="relative">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border" />
-            </div>
-            <div className="relative flex justify-center text-xs uppercase">
-              <span className="bg-card px-2 text-muted-foreground">
-                Or continue with email
-              </span>
-            </div>
-          </div>
-
           {/* Dev Mode Guest Login */}
           <Button
             onClick={() => {
@@ -182,57 +135,6 @@ export default function LoginPage() {
             <UserCircle className="w-4 h-4 mr-2" />
             Dev Mode: Guest Login
           </Button>
-
-          {/* Email/Password Form */}
-          <form onSubmit={handleEmailSignIn} className="space-y-4">
-            <div className="space-y-2">
-              <label htmlFor="email" className="text-sm font-medium text-foreground">
-                Email
-              </label>
-              <div className="relative">
-                <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="email"
-                  type="email"
-                  placeholder="your@email.com"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  className="pl-10 h-11 bg-background/50 border-border focus:border-primary"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-2">
-              <label htmlFor="password" className="text-sm font-medium text-foreground">
-                Password
-              </label>
-              <div className="relative">
-                <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-                <Input
-                  id="password"
-                  type="password"
-                  placeholder="••••••••"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  className="pl-10 h-11 bg-background/50 border-border focus:border-primary"
-                  disabled={isLoading}
-                />
-              </div>
-            </div>
-
-            <Button
-              type="submit"
-              disabled={isLoading}
-              className="w-full h-11 bg-secondary hover:bg-secondary/80 text-secondary-foreground"
-            >
-              {isLoading ? (
-                <Loader2 className="w-5 h-5 animate-spin" />
-              ) : (
-                'Sign In'
-              )}
-            </Button>
-          </form>
         </Card>
 
         {/* Footer */}

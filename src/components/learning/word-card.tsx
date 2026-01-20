@@ -1,11 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Word } from '@/types';
 import { Card } from '@/components/ui/card';
 import { cn } from '@/lib/utils';
-import { Volume2, RotateCw } from 'lucide-react';
+import { Volume2, RotateCw, Pause } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 
 interface WordCardProps {
@@ -16,13 +16,42 @@ interface WordCardProps {
 }
 
 export function WordCard({ word, isFlipped, onFlip, className }: WordCardProps) {
-  // Sound handler (placeholder for now)
-  const playSound = (e: React.MouseEvent) => {
-    e.stopPropagation();
-    // In future: new Audio(word.audioUrl).play();
-    console.log('Play audio for:', word.arabic);
-  };
+  const [playingVerseUrl, setPlayingVerseUrl] = useState<string | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
 
+  const handlePlayVerse = (url: string) => {
+    // 1. If same URL is playing, pause it
+    if (playingVerseUrl === url && audioRef.current) {
+        audioRef.current.pause();
+        setPlayingVerseUrl(null);
+        return;
+    }
+
+    // 2. Stop any existing audio
+    if (audioRef.current) {
+        audioRef.current.pause();
+    }
+
+    // 3. Play new
+    const audio = new Audio(url);
+    audioRef.current = audio;
+    setPlayingVerseUrl(url);
+
+    audio.onended = () => {
+        setPlayingVerseUrl(null);
+    };
+
+    audio.onerror = () => {
+        console.error("Failed to play verse audio");
+        setPlayingVerseUrl(null);
+    };
+
+    audio.play().catch(err => {
+        console.error("Playback error:", err);
+        setPlayingVerseUrl(null);
+    });
+  };
+  // Sound handler
   return (
     <div className={cn("relative w-full aspect-[4/5] perspective-1000", className)} onClick={onFlip}>
       <motion.div
@@ -106,34 +135,71 @@ export function WordCard({ word, isFlipped, onFlip, className }: WordCardProps) 
                     <p className="text-[10px] uppercase tracking-widest text-muted-foreground text-center font-semibold mb-1">
                       Usage in Quran
                     </p>
-                    {word.examples.slice(0, 2).map((ex, i) => (
-                      <div key={i} className="bg-muted/30 p-3 rounded-lg border border-border/30 text-sm">
-                        <p className="font-arabic text-base text-right mb-1 leading-relaxed text-foreground/90 py-1" dir="rtl">
-                          {(() => {
-                            // Simple highlighter
-                            const parts = ex.verse.split(word.arabic);
-                            if (parts.length === 1) return ex.verse; // No match found
-                            return parts.map((part, idx) => (
-                               <span key={idx}>
-                                 {part}
-                                 {idx < parts.length - 1 && (
-                                   <span className="text-red-500 font-bold mx-1">{word.arabic}</span>
-                                 )}
-                               </span>
-                            ));
-                          })()}
-                        </p>
-                        {ex.translation ? (
-                           <p className="text-xs text-foreground/70 italic leading-normal mt-1.5">
-                             "{ex.translation}" <span className="text-primary/70 not-italic font-bold ml-1 text-[10px]">({ex.reference})</span>
-                           </p>
-                        ) : (
-                           <p className="text-xs text-muted-foreground/50 italic leading-normal mt-1.5">
-                             Translation unavailable <span className="text-primary/70 not-italic font-bold ml-1">({ex.reference})</span>
-                           </p>
-                        )}
-                      </div>
-                    ))}
+                    {word.examples.slice(0, 2).map((ex, i) => {
+                      // Extract Surah and Ayah from reference (e.g. "1:1" or "Al-Fatiha 1:1")
+                      const match = ex.reference.match(/(\d+):(\d+)/);
+                      const surah = match ? match[1].padStart(3, '0') : null;
+                      const ayah = match ? match[2].padStart(3, '0') : null;
+                      const audioUrl = surah && ayah ? `https://everyayah.com/data/Alafasy_128kbps/${surah}${ayah}.mp3` : null;
+
+                      const isPlaying = playingVerseUrl === audioUrl;
+
+                      return (
+                        <div key={i} className="bg-muted/30 p-3 rounded-lg border border-border/30 text-sm">
+                          <p className="font-arabic text-base text-right mb-1 leading-relaxed text-foreground/90 py-1" dir="rtl">
+                            {(() => {
+                              const parts = ex.verse.split(word.arabic);
+                              if (parts.length === 1) return ex.verse;
+                              return parts.map((part, idx) => (
+                                 <span key={idx}>
+                                   {part}
+                                   {idx < parts.length - 1 && (
+                                     <span className="text-primary font-bold mx-1">{word.arabic}</span>
+                                   )}
+                                 </span>
+                              ));
+                            })()}
+                          </p>
+                          {ex.translation ? (
+                             <div className="flex flex-col gap-1.5 mt-2">
+                               <p className="text-xs text-foreground/70 italic leading-normal">
+                                 "{ex.translation}"
+                               </p>
+                               <div className="flex items-center justify-between">
+                                  {audioUrl && (
+                                    <Button
+                                      variant="ghost"
+                                      size="sm"
+                                      onClick={(e) => {
+                                        e.stopPropagation();
+                                        handlePlayVerse(audioUrl);
+                                      }}
+                                      className="h-6 px-2 text-[10px] text-primary hover:text-primary hover:bg-primary/10 gap-1.5"
+                                    >
+                                      {isPlaying ? (
+                                        <>
+                                          <Pause className="w-3 h-3" />
+                                          Playing...
+                                        </>
+                                      ) : (
+                                        <>
+                                          <Volume2 className="w-3 h-3" />
+                                          Listen
+                                        </>
+                                      )}
+                                    </Button>
+                                  )}
+                                  <span className="text-primary/70 font-bold text-[10px] ml-auto">({ex.reference})</span>
+                               </div>
+                             </div>
+                          ) : (
+                             <p className="text-xs text-muted-foreground/50 italic leading-normal mt-1.5">
+                               Translation unavailable <span className="text-primary/70 not-italic font-bold ml-1">({ex.reference})</span>
+                             </p>
+                          )}
+                        </div>
+                      );
+                    })}
                   </div>
                 )}
                 

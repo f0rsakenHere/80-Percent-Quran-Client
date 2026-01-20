@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Space_Grotesk, Noto_Naskh_Arabic } from "next/font/google";
 import "./globals.css";
 import "./mobile-fix.css";
@@ -20,28 +20,29 @@ const notoNaskh = Noto_Naskh_Arabic({
   display: "swap",
 });
 
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
+  themeColor: "#10b981",
+};
+
 export const metadata: Metadata = {
   title: "80% Quran - Learn Quranic Vocabulary",
   description: "Master the most frequent words in the Quran and understand 80% of its content through interactive flashcards",
   keywords: ["Quran", "Arabic", "Vocabulary", "Islamic", "Learning", "Flashcards"],
   authors: [{ name: "80% Quran Team" }],
   manifest: "/manifest.json",
-  themeColor: "#10b981", // Emerald green
   icons: {
     icon: [
-      { url: "/favicon.ico", sizes: "any" },
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
-      { url: "/icon-512.png", sizes: "512x512", type: "image/png" },
+      { url: "/favicon.ico?v=2", sizes: "any" },
+      { url: "/icon-192.png?v=2", sizes: "192x192", type: "image/png" },
+      { url: "/icon-512.png?v=2", sizes: "512x512", type: "image/png" },
     ],
     apple: [
-      { url: "/icon-192.png", sizes: "192x192", type: "image/png" },
+      { url: "/icon-192.png?v=2", sizes: "192x192", type: "image/png" },
     ],
-  },
-  viewport: {
-    width: "device-width",
-    initialScale: 1,
-    maximumScale: 1,
-    userScalable: false,
   },
 };
 
