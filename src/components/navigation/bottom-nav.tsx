@@ -2,7 +2,7 @@
 
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Home, BookOpen, BarChart3, User } from 'lucide-react';
+import { Home, BookOpen, BarChart3, User, Lightbulb } from 'lucide-react';
 import { cn } from '@/lib/utils';
 
 export function BottomNav() {
@@ -15,6 +15,7 @@ export function BottomNav() {
   const items = [
     { label: 'Home', icon: Home, path: '/' },
     { label: 'Learn', icon: BookOpen, path: '/learn' },
+    { label: 'Wisdom', icon: Lightbulb, path: '/wisdom' },
     { label: 'Progress', icon: BarChart3, path: '/progress' },
     { label: 'Profile', icon: User, path: '/profile' },
   ];
