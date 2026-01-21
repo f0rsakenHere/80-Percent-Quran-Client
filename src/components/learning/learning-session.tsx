@@ -85,7 +85,22 @@ export default function LearningSession() {
              try {
                // Only fetch if not already present
                if (!word.examples) {
-                   const exRes = await getQuranExamples(word.arabic, 2);
+                   let exRes;
+                   try {
+                     exRes = await getQuranExamples(word.arabic, 2);
+                   } catch (firstError) {
+                     // Retry with simple Arabic (no diacritics)
+                     const simpleArabic = word.arabic.replace(/[\u064B-\u065F\u0670]/g, '');
+                     if (simpleArabic !== word.arabic) {
+                       try {
+                         exRes = await getQuranExamples(simpleArabic, 2);
+                       } catch (secondError) {
+                         throw firstError; // Throw original error if fallback also fails
+                       }
+                     } else {
+                       throw firstError;
+                     }
+                   }
                    // Robust check for results (handle {results:[]} or {data:{results:[]}} or {success:true, data:...})
                    const data = exRes as any;
                    const searchResults = data.results 
@@ -129,7 +144,45 @@ export default function LearningSession() {
       }
     } catch (error) {
       console.error('Failed to load session', error);
-      toast.error('Failed to load words');
+      // Fallback to mock data
+      setWords([
+        { 
+          _id: '4', id: 4, arabic: 'اللَّهِ', translation: 'Allah', transliteration: 'Allāh', frequency: 940, type: 'Noun', createdAt: '', updatedAt: '',
+          examples: [
+            { verse: 'بِسْمِ ٱللَّهِ ٱلرَّحْمَـٰنِ ٱلرَّحِيمِ', translation: 'In the name of Allah, the Entirely Merciful, the Especially Merciful.', reference: '1:1' },
+            { verse: 'ٱلْحَمْدُ لِلَّهِ رَبِّ ٱلْعَـٰلَمِينَ', translation: 'All praise is due to Allah, Lord of the worlds.', reference: '1:2' }
+          ]
+        },
+        { 
+          _id: '1', id: 1, arabic: 'مِنْ', translation: 'From', transliteration: 'Min', frequency: 1673, type: 'Noun', createdAt: '', updatedAt: '',
+          examples: [
+            { verse: 'مِن شَرِّ مَا خَلَقَ', translation: 'From the evil of that which He created', reference: '113:2' },
+            { verse: 'وَمِن شَرِّ غَاسِقٍ إِذَا وَقَبَ', translation: 'And from the evil of darkness when it settles', reference: '113:3' }
+          ]
+        },
+        { 
+          _id: '17', id: 17, arabic: 'إِلَى', translation: 'To', transliteration: 'Ilā', frequency: 405, type: 'Noun', createdAt: '', updatedAt: '',
+          examples: [
+            { verse: 'إِنَّا لِلَّهِ وَإِنَّا إِلَيْهِ رَاجِعُونَ', translation: 'Indeed we belong to Allah, and indeed to Him we will return.', reference: '2:156' },
+            { verse: 'وَإِلَى ٱللَّهِ تُرْجَعُ ٱلْأُمُورُ', translation: 'And to Allah all matters return.', reference: '3:109' }
+          ] 
+        },
+        { 
+           _id: '9', id: 9, arabic: 'عَلَى', translation: 'On', transliteration: "ʿAlā", frequency: 670, type: 'Noun', createdAt: '', updatedAt: '',
+           examples: [
+             { verse: 'عَلَىٰ صِرَاطٍ مُّسْتَقِيمٍ', translation: 'On a straight path.', reference: '36:4' },
+             { verse: 'وَعَلَى ٱللَّهِ فَلْيَتَوَكَّلِ ٱلْمُؤْمِنُونَ', translation: 'And upon Allah let the believers rely.', reference: '3:122' }
+           ]
+        },
+        { 
+          _id: '2', id: 2, arabic: 'فِي', translation: 'In', transliteration: 'Fiy', frequency: 1185, type: 'Noun', createdAt: '', updatedAt: '',
+          examples: [
+             { verse: 'فِي قُلُوبِهِم مَّرَضٌ', translation: 'In their hearts is disease', reference: '2:10' },
+             { verse: 'لَقَدْ كَانَ لَكُمْ فِي رَسُولِ ٱللَّهِ أُسْوَةٌ حَسَنَةٌ', translation: 'There has certainly been for you in the Messenger of Allah an excellent pattern', reference: '33:21' }
+          ]
+        },
+      ]);
+      toast.error('Network error. Using offline mode.');
     } finally {
       setLoading(false);
     }

@@ -148,22 +148,56 @@ export function WordCard({ word, isFlipped, onFlip, className }: WordCardProps) 
                         <div key={i} className="bg-muted/30 p-3 rounded-lg border border-border/30 text-sm">
                           <p className="font-arabic text-base text-right mb-1 leading-relaxed text-foreground/90 py-1" dir="rtl">
                             {(() => {
-                              const parts = ex.verse.split(word.arabic);
-                              if (parts.length === 1) return ex.verse;
-                              return parts.map((part, idx) => (
-                                 <span key={idx}>
-                                   {part}
-                                   {idx < parts.length - 1 && (
-                                     <span className="text-primary font-bold mx-1">{word.arabic}</span>
-                                   )}
-                                 </span>
-                              ));
+                                const removeDiacritics = (t: string) => t.replace(/[\u064B-\u065F\u0670\u06D6-\u06ED\u0610-\u061A\u0640]/g, '');
+                                const cleanSearch = removeDiacritics(word.arabic);
+                                
+                                if (!cleanSearch) return ex.verse;
+
+                                // Build a flexible regex pattern
+                                // 1. Escape special regex chars
+                                // 2. Map Arabic chars to flexible groups (e.g. Alefs)
+                                // 3. Insert optional diacritics between every char
+                                const chars = cleanSearch.split('');
+                                
+                                const getCharPattern = (char: string) => {
+                                  // Alef variations: Alif, Alif with Hamzas, Alif Madda, Alif Wasla
+                                  if (/[اأإآٱ]/.test(char)) return '[اأإآٱ]';
+                                  // Ya / Alif Maqsura (optional, usually good to safely distinguish but sometimes mixed)
+                                  if (/[يى]/.test(char)) return '[يى]';
+                                  // Ta Marbuta / Ha (often distinct but sometimes worth grouping if data is messy)
+                                  // if (/[ةه]/.test(char)) return '[ةه]';
+                                  
+                                  return char.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                };
+                                
+                                const diacriticsPattern = '[\\u064B-\\u065F\\u0670\\u06D6-\\u06ED\\u0610-\\u061A\\u0640]*';
+                                
+                                const pattern = chars
+                                  .map(getCharPattern)
+                                  .join(diacriticsPattern); 
+                                
+                                const regex = new RegExp(`(${pattern})`, 'g');
+                                const parts = ex.verse.split(regex);
+
+                                if (parts.length === 1) return ex.verse;
+
+                                return parts.map((part, idx) => {
+                                  // Odd indices are the captured matches
+                                  if (idx % 2 === 1) {
+                                    return (
+                                      <span key={idx} className="text-primary font-bold mx-0.5 drop-shadow-sm">
+                                        {part}
+                                      </span>
+                                    );
+                                  }
+                                  return <span key={idx}>{part}</span>;
+                                });
                             })()}
                           </p>
                           {ex.translation ? (
                              <div className="flex flex-col gap-1.5 mt-2">
                                <p className="text-xs text-foreground/70 italic leading-normal">
-                                 "{ex.translation}"
+                                 "{ex.translation.replace(/\s*\d+\s*$/, '')}"
                                </p>
                                <div className="flex items-center justify-between">
                                   {audioUrl && (
