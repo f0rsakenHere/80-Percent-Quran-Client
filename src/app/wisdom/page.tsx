@@ -1,11 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
-import { getRandomStory } from '@/lib/api/stories';
+import { useState, useEffect, useRef } from 'react';
+import { getRandomStory, getStoryById } from '@/lib/api/stories';
 import { Story } from '@/types/story';
 import { Button } from '@/components/ui/button';
 import { Card } from '@/components/ui/card';
-import { Loader2, RefreshCw, Share2, Lightbulb, Quote } from 'lucide-react';
+import { Loader2, RefreshCw, Share2, Lightbulb, Quote, ArrowLeft, ArrowRight } from 'lucide-react';
 import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 
@@ -13,21 +13,42 @@ export default function WisdomPage() {
   const [story, setStory] = useState<Story | null>(null);
   const [loading, setLoading] = useState(true);
   const [refreshing, setRefreshing] = useState(false);
+  const [navigating, setNavigating] = useState(false);
 
-  async function fetchStory() {
+  const seenIds = useRef<Set<string>>(new Set());
+
+  // Function to fetch a purely random story
+  async function fetchRandomStory() {
     try {
       setRefreshing(true);
       // Min loading time for UX
-      const [data] = await Promise.all([
-        getRandomStory(),
-        new Promise(resolve => setTimeout(resolve, 600))
-      ]);
+      const minLoadTime = new Promise(resolve => setTimeout(resolve, 600));
       
-      if (data && data.success && data.data) {
-        setStory(data.data);
+      let attempts = 0;
+      let newStory: Story | null = null;
+
+      // Retry loop to find a new story
+      while (attempts < 3) {
+        const res = await getRandomStory();
+        if (res.success && res.data) {
+           const idStr = String(res.data._id || res.data.id);
+           if (!seenIds.current.has(idStr)) {
+             newStory = res.data;
+             seenIds.current.add(idStr);
+             break;
+           }
+        }
+        attempts++;
+      }
+
+      await minLoadTime;
+      
+      if (newStory) {
+        setStory(newStory);
+      } else if (!story) {
+         toast.error("Couldn't find a new story right now");
       } else {
-        // Fallback or error
-        toast.error('Could not fetch a story');
+         toast.info("No new stories found, showing the previous one.");
       }
     } catch (error) {
       console.error('Failed to get story', error);
@@ -38,9 +59,43 @@ export default function WisdomPage() {
     }
   }
 
+  // Function to fetch a specific story by numeric ID
+  async function fetchStoryById(id: number) {
+    try {
+      setNavigating(true);
+      const res = await getStoryById(id.toString());
+      if (res.success && res.data) {
+        setStory(res.data);
+        const idStr = String(res.data._id || res.data.id);
+        seenIds.current.add(idStr);
+      } else {
+        toast.error('Story not found');
+      }
+    } catch (error) {
+      console.error('Failed to get story', error);
+      toast.error('Failed to navigate');
+    } finally {
+      setNavigating(false);
+    }
+  }
+
   useEffect(() => {
-    fetchStory();
+    fetchRandomStory();
   }, []);
+
+  const handleNext = () => {
+    if (story && story.id) {
+      fetchStoryById(story.id + 1);
+    }
+  };
+
+  const handlePrevious = () => {
+    if (story && story.id && story.id > 1) {
+      fetchStoryById(story.id - 1);
+    } else {
+      toast.info('This is the first story.');
+    }
+  };
 
   const handleShare = () => {
     if (!story) return;
@@ -68,19 +123,14 @@ export default function WisdomPage() {
          try {
            const textArea = document.createElement("textarea");
            textArea.value = textToShare;
-           
-           // Ensure it's not visible but part of DOM
            textArea.style.position = "fixed";
            textArea.style.opacity = "0";
            textArea.style.left = "-9999px";
-           
            document.body.appendChild(textArea);
            textArea.focus();
            textArea.select();
-           
            const successful = document.execCommand('copy');
            document.body.removeChild(textArea);
-           
            if (successful) toast.success('Copied to clipboard');
            else toast.error('Failed to copy');
          } catch (err) {
@@ -102,7 +152,7 @@ export default function WisdomPage() {
            </div>
            <h1 className="text-sm font-bold uppercase tracking-widest text-primary">Daily Wisdom</h1>
         </div>
-        <p className="text-2xl md:text-3xl font-serif text-foreground/90 font-medium">
+        <p className="text-lg text-muted-foreground font-medium">
           Authentic lessons from the Sunnah
         </p>
       </div>
@@ -110,7 +160,7 @@ export default function WisdomPage() {
       {/* Main Content Card */}
       <div className="w-full relative group">
         {/* Glow Effect */}
-        <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-3xl blur-xl opacity-50 group-hover:opacity-75 transition-opacity duration-1000" />
+        <div className="absolute -inset-1 bg-gradient-to-r from-primary/20 via-accent/20 to-primary/20 rounded-3xl blur-xl opacity-50 transition-opacity duration-1000" />
         
         <Card className="relative w-full overflow-hidden border-primary/10 bg-card/80 backdrop-blur-sm p-6 md:p-10 flex flex-col items-center text-center shadow-2xl">
           
@@ -142,19 +192,19 @@ export default function WisdomPage() {
                 </h2>
 
                 {/* Body */}
-                <div className="relative">
+                <div className="relative mb-6">
                    {/* Side lines */}
                    <div className="absolute left-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-primary/20 to-transparent opacity-50" />
                    <div className="absolute right-0 top-0 bottom-0 w-0.5 bg-gradient-to-b from-transparent via-primary/20 to-transparent opacity-50" />
                    
-                   <p className="text-lg md:text-xl leading-relaxed text-muted-foreground font-serif italic px-6 md:px-8">
+                   <p className="text-base md:text-lg leading-relaxed text-muted-foreground font-serif italic px-6 md:px-8 max-h-[50vh] overflow-y-auto hide-scrollbar">
                      "{story.body || story.content || story.text || story.description || 'No content available'}"
                    </p>
                 </div>
 
                 {/* Source */}
                 {story.source && (
-                   <div className="pt-4 border-t border-border/40 w-full max-w-xs mx-auto">
+                   <div className="pt-4 border-t border-border/40 w-full max-w-xs mx-auto pb-2">
                      <p className="text-xs font-bold text-primary uppercase tracking-widest">
                        Source
                      </p>
@@ -175,23 +225,50 @@ export default function WisdomPage() {
       </div>
 
       {/* Actions */}
-      <div className="flex gap-4 z-10">
+      <div className="flex gap-4 z-10 items-center">
+        
+        {/* Previous Button */}
+        <Button
+           variant="ghost"
+           size="icon"
+           onClick={handlePrevious}
+           disabled={navigating || !story || (story.id !== undefined && story.id <= 1)}
+           className="rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
+           title="Previous Story"
+        >
+          <ArrowLeft className="w-5 h-5" />
+        </Button>
+
+        {/* Random / New Wisdom Button */}
         <Button 
           variant="outline" 
           size="lg"
-          onClick={fetchStory}
+          onClick={fetchRandomStory}
           disabled={refreshing || loading}
-          className="gap-2 rounded-full border-primary/20 hover:bg-primary/5 hover:border-primary/50 transition-all shadow-sm"
+          className="gap-2 rounded-full border-primary/50 hover:bg-primary hover:text-primary-foreground transition-all shadow-sm"
         >
           <RefreshCw className={`w-4 h-4 ${refreshing ? 'animate-spin' : ''}`} />
           <span>New Wisdom</span>
         </Button>
+
+        {/* Next Button */}
+        <Button
+           variant="ghost"
+           size="icon"
+           onClick={handleNext}
+           disabled={navigating || !story}
+           className="rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
+           title="Next Story"
+        >
+          <ArrowRight className="w-5 h-5" />
+        </Button>
         
+        {/* Share Button (moved slightly or kept as auxiliary) */}
         <Button 
           variant="ghost" 
           size="icon"
           onClick={handleShare}
-          className="rounded-full hover:bg-primary/10 hover:text-primary transition-colors"
+          className="rounded-full hover:bg-primary/10 hover:text-primary transition-colors ml-2"
           title="Share"
         >
           <Share2 className="w-5 h-5" />
