@@ -80,69 +80,79 @@ export default function LearningSession() {
       } else {
         const res = await getWordsToLearn(10);
         if (res.success && res.data && res.data.words) {
-          // Hydrate with examples if missing
-          const hydratedWords = await Promise.all(res.data.words.map(async (word: any) => {
+          const initialWords = res.data.words;
+          setWords(initialWords);
+          setLoading(false); // Unblock UI immediately so user can see words
+
+          // Background: Fetch examples sequentially to avoid Rate Limit (429)
+          for (let i = 0; i < initialWords.length; i++) {
+             const word = initialWords[i];
+             // Skip if we already have examples
+             if (word.examples && word.examples.length > 0) continue;
+
              try {
-               // Only fetch if not already present
-               if (!word.examples) {
-                   let exRes;
-                   try {
-                     exRes = await getQuranExamples(word.arabic, 2);
-                   } catch (firstError) {
-                     // Retry with simple Arabic (no diacritics)
-                     const simpleArabic = word.arabic.replace(/[\u064B-\u065F\u0670]/g, '');
-                     if (simpleArabic !== word.arabic) {
-                       try {
-                         exRes = await getQuranExamples(simpleArabic, 2);
-                       } catch (secondError) {
-                         throw firstError; // Throw original error if fallback also fails
-                       }
-                     } else {
-                       throw firstError;
+                // Rate Limit Protection: Delay between requests
+                if (i > 0) await new Promise(r => setTimeout(r, 600));
+
+                let exRes;
+                try {
+                   exRes = await getQuranExamples(word.arabic, 2);
+                } catch (e) {
+                   // Retry Logic: Try without diacritics
+                   const simpleArabic = word.arabic.replace(/[\u064B-\u065F\u0670]/g, '');
+                   if (simpleArabic !== word.arabic) {
+                     try {
+                        await new Promise(r => setTimeout(r, 300)); 
+                        exRes = await getQuranExamples(simpleArabic, 2);
+                     } catch (e2) {
+                        console.warn(`Retry failed for ${word.arabic}`);
+                        continue;
                      }
+                   } else {
+                     continue;
                    }
-                   // Robust check for results (handle {results:[]} or {data:{results:[]}} or {success:true, data:...})
-                   const data = exRes as any;
-                   const searchResults = data.results 
-                       || (data.search && data.search.results)
-                       || (data.data && data.data.results)
-                       || (data.data && data.data.search && data.data.search.results);
+                }
 
-                   if (searchResults) {
+                // Process Results
+                const data = exRes as any;
+                const searchResults = data.results 
+                    || (data.search && data.search.results)
+                    || (data.data && data.data.results)
+                    || (data.data && data.data.search && data.data.search.results);
+
+                if (searchResults) {
+                   const examples = searchResults.map((r: any) => {
+                      let translationText = '';
+                      if (r.translations && r.translations.length > 0) {
+                          translationText = r.translations[0].text
+                              .replace(/<[^>]*>/g, '') 
+                              .replace(/(\d+)/g, '')   
+                              .trim();
+                      } else if (r.words && r.words.length > 0) {
+                           translationText = r.words
+                             .map((w: any) => w.translation?.text)
+                             .filter(Boolean)
+                             .join(' ')
+                             .replace(/[\(\)\[\]]/g, '');
+                      }
+
                       return {
-                        ...word,
-                        examples: searchResults.map((r: any) => {
-                           let translationText = '';
-                           if (r.translations && r.translations.length > 0) {
-                               translationText = r.translations[0].text
-                                   .replace(/<[^>]*>/g, '') // remove HTML
-                                   .replace(/(\d+)/g, '')   // remove numbers/footnotes
-                                   .trim();
-                           } else if (r.words && r.words.length > 0) {
-                               // Clean up word-by-word translation (remove brackets for smoother reading)
-                               translationText = r.words
-                                 .map((w: any) => w.translation?.text)
-                                 .filter(Boolean)
-                                 .join(' ')
-                                 .replace(/[\(\)\[\]]/g, ''); // Remove ( ) [ ]
-                           }
-
-                           return {
-                               verse: r.text_uthmani || r.text,
-                               translation: translationText,
-                               reference: r.verse_key
-                           };
-                        })
+                          verse: r.text_uthmani || r.text,
+                          translation: translationText,
+                          reference: r.verse_key
                       };
-                   }
-               }
-               return word;
-             } catch (e) {
-               console.warn('Failed to fetch examples for', word.arabic);
-               return word;
+                   });
+
+                   // Update State: Hydrate this specific word with examples
+                   setWords(prev => prev.map(w => 
+                      w.id === word.id ? { ...w, examples } : w
+                   ));
+                }
+             } catch (err) {
+                console.warn(`Skipping examples for ${word.arabic}`, err);
              }
-          }));
-          setWords(hydratedWords);
+          }
+          return; // Exit function (skip finally block's redundent loading=false)
         }
       }
     } catch (error) {
