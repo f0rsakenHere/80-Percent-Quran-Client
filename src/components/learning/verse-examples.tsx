@@ -9,9 +9,10 @@ import { Loader2, AlertCircle, Volume2, Pause } from 'lucide-react';
 
 interface VerseExamplesProps {
   arabicWord: string;
+  banglaMeaning?: string; // Optional Bengali meaning for highlighting
 }
 
-export function VerseExamples({ arabicWord }: VerseExamplesProps) {
+export function VerseExamples({ arabicWord, banglaMeaning }: VerseExamplesProps) {
   const [examples, setExamples] = useState<QuranSearchResult[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -28,7 +29,8 @@ export function VerseExamples({ arabicWord }: VerseExamplesProps) {
       setError(null);
       
       try {
-        const response = await getQuranExamples(arabicWord, 2); // Default size 2
+        // Backend now returns both Bengali and English by default
+        const response = await getQuranExamples(arabicWord, 2);
         
         if (mounted) {
           const data = response as any;
@@ -137,6 +139,7 @@ export function VerseExamples({ arabicWord }: VerseExamplesProps) {
       <h3 className="text-sm font-bold text-foreground opacity-50 uppercase tracking-wider text-center">
         Usage Examples
       </h3>
+      
       {examples.map((ex, idx) => (
         <Card 
           key={idx} 
@@ -173,31 +176,85 @@ export function VerseExamples({ arabicWord }: VerseExamplesProps) {
             
             <div className="h-px w-full bg-border/40 my-2" />
 
-            {/* Translation & Reference */}
-            <div className="flex flex-col gap-1">
-               <p className="text-sm text-foreground italic leading-relaxed opacity-90">
-                 "{(() => {
-                    if (ex.translations && ex.translations.length > 0) {
-                        // Remove HTML tags if present and remove footnote numbers
-                        return ex.translations[0].text
-                            .replace(/<[^>]*>/g, '') // remove HTML
-                            .replace(/(\d+)/g, '')   // remove numbers/footnotes
-                            .trim();
-                    }
-                    // Fallback to word-by-word
-                    const anyEx = ex as any; 
-                    if (anyEx.words && anyEx.words.length > 0) {
-                        return anyEx.words
-                          .map((w: any) => w.translation?.text)
-                          .filter(Boolean)
-                          .join(' ')
-                          .replace(/[\(\)\[\]]/g, '')
-                          .replace(/(\d+)/g, '') // remove numbers
-                          .trim();
-                    }
-                    return '';
-                 })()}"
-               </p>
+            {/* Translations (English & Bengali) */}
+            <div className="flex flex-col gap-2">
+               {ex.translations && ex.translations.length > 0 ? (
+                 // Display single Bengali translation
+                 (() => {
+                   const cleanText = ex.translations[0].text
+                     .replace(/<[^>]*>/g, '') 
+                     .replace(/(\d+)/g, '')   
+                     .trim();
+                   
+                   return (
+                     <p className="text-lg font-bengali text-foreground/95 leading-relaxed">
+                       {(() => {
+                         // Highlighting Logic (Same as WordCard)
+                         const text = cleanText;
+                         if (!banglaMeaning) return `"${text}"`;
+
+                         // 1. Split definition into individual words
+                         const allWords = banglaMeaning
+                           .split(/[\/\s,]+/)
+                           .map(s => s.trim())
+                           .filter(w => w.length > 0);
+                         
+                         const uniqueWords = Array.from(new Set(allWords));
+                         
+                         if (uniqueWords.length === 0) return `"${text}"`;
+
+                         // 2. Sort by length descending
+                         uniqueWords.sort((a, b) => b.length - a.length);
+
+                         // 3. Create Regex from tokens with boundary checks for short words
+                         const patternString = uniqueWords
+                           .map(w => {
+                             const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                             if (w.length <= 2) {
+                                return `(?<![\\u0980-\\u09FF])${escaped}(?![\\u0980-\\u09FF])`;
+                             }
+                             return escaped;
+                           })
+                           .join('|');
+                         
+                         const regex = new RegExp(`(${patternString})`, 'gi');
+                         const parts = text.split(regex);
+
+                         return (
+                           <>
+                             "{parts.map((part, i) => (
+                               regex.test(part) ? (
+                                 <span key={i} className="text-primary font-bold">
+                                   {part}
+                                 </span>
+                               ) : (
+                                 <span key={i}>{part}</span>
+                               )
+                             ))}"
+                           </>
+                         );
+                       })()}
+                     </p>
+                   );
+                 })()
+               ) : (
+                 // Fallback to word-by-word translation
+                 <p className="text-sm text-foreground italic leading-relaxed opacity-90">
+                   "{(() => {
+                     const anyEx = ex as any; 
+                     if (anyEx.words && anyEx.words.length > 0) {
+                         return anyEx.words
+                           .map((w: any) => w.translation?.text)
+                           .filter(Boolean)
+                           .join(' ')
+                           .replace(/[\(\)\[\]]/g, '')
+                           .replace(/(\d+)/g, '') // remove numbers
+                           .trim();
+                     }
+                     return '';
+                   })()}"
+                 </p>
+               )}
                <div className="flex justify-between items-center mt-1">
                  <Button
                    size="sm"

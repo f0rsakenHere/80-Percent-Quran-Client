@@ -11,6 +11,8 @@ export interface Word {
     id: number;
     arabic: string;
     translation: string;
+    english?: string; // Explicit English translation if available
+    bangla?: string;  // Bengali translation
     transliteration: string;
     frequency: number;
     type: 'Noun' | 'Verb' | 'Particle' | 'Adjective' | 'Pronoun' | 'Preposition' | 'Other';

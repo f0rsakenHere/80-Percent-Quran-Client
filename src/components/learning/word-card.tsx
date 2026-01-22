@@ -120,13 +120,20 @@ export function WordCard({ word, isFlipped, onFlip, className }: WordCardProps) 
                   {word.type} • #{word.id}
                 </div>
   
-                <div className="shrink-0 space-y-0.5">
-                  <h3 className="text-2xl font-bold bg-gradient-to-br from-foreground to-muted-foreground bg-clip-text text-transparent">
+                <div className="shrink-0 flex flex-col items-center justify-center gap-3 py-2">
+                  <h3 className="text-xl md:text-2xl font-bold text-foreground/90 leading-snug">
                     {word.translation}
                   </h3>
-                  <p className="text-base text-primary/80 font-medium italic font-serif">
-                    /{word.transliteration}/
-                  </p>
+                  {word.bangla && (
+                    <p className="text-2xl md:text-3xl font-bengali text-primary leading-relaxed -mt-1">
+                      {word.bangla}
+                    </p>
+                  )}
+                  <div className="inline-flex items-center justify-center px-3 py-1 rounded-full bg-primary/5 border border-primary/10">
+                    <p className="text-sm text-primary/80 font-medium italic font-serif">
+                      /{word.transliteration}/
+                    </p>
+                  </div>
                 </div>
   
                 {/* Quran Verses Section */}
@@ -196,9 +203,58 @@ export function WordCard({ word, isFlipped, onFlip, className }: WordCardProps) 
                           </p>
                           {ex.translation ? (
                              <div className="flex flex-col gap-1.5 mt-2">
-                               <p className="text-xs text-foreground/70 italic leading-normal">
-                                 "{ex.translation.replace(/\s*\d+\s*$/, '')}"
-                               </p>
+                                <p className="text-sm font-bengali text-foreground/90 leading-relaxed">
+                                  {(() => {
+                                    const text = ex.translation.replace(/\s*\d+\s*$/, '');
+                                    if (!word.bangla) return `"${text}"`;
+
+                                    // 1. Split definition into individual words
+                                    // "তা থেকে / তা হতে" -> ["তা", "থেকে", "হতে"]
+                                    const allWords = word.bangla
+                                      .split(/[\/\s,]+/) // Split by slash, space, comma
+                                      .map(s => s.trim())
+                                      .filter(w => w.length > 0);
+                                    
+                                    const uniqueWords = Array.from(new Set(allWords));
+                                    
+                                    if (uniqueWords.length === 0) return `"${text}"`;
+
+                                    // 2. Sort by length descending to match longer words first
+                                    // e.g. ["থেকে", "হতে", "তা"]
+                                    uniqueWords.sort((a, b) => b.length - a.length);
+
+                                    // 3. Create Regex from tokens
+                                    const patternString = uniqueWords
+                                      .map(w => {
+                                        const escaped = w.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+                                        // For short words (<= 2 chars), enforce boundaries to avoid matching inside unrelated words
+                                        // e.g. avoid matching "তা" (ta) inside "তারা" (tara - they)
+                                        // Bengali Unicode Range: \u0980-\u09FF
+                                        if (w.length <= 2) {
+                                           return `(?<![\\u0980-\\u09FF])${escaped}(?![\\u0980-\\u09FF])`;
+                                        }
+                                        return escaped;
+                                      })
+                                      .join('|');
+                                    
+                                    const regex = new RegExp(`(${patternString})`, 'gi');
+                                    const parts = text.split(regex);
+
+                                    return (
+                                      <>
+                                        "{parts.map((part, i) => (
+                                          regex.test(part) ? (
+                                            <span key={i} className="text-primary font-bold">
+                                              {part}
+                                            </span>
+                                          ) : (
+                                            <span key={i}>{part}</span>
+                                          )
+                                        ))}"
+                                      </>
+                                    );
+                                  })()}
+                                </p>
                                <div className="flex items-center justify-between">
                                   {audioUrl && (
                                     <Button

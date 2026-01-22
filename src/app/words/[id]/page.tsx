@@ -99,8 +99,15 @@ export default function WordDetailsPage() {
                <h2 className="font-arabic text-6xl md:text-7xl text-primary drop-shadow-sm leading-normal py-4">
                  {word.arabic}
                </h2>
-               <h3 className="text-3xl font-bold">{word.translation}</h3>
-               <p className="text-muted-foreground text-lg italic serif">/{word.transliteration}/</p>
+                <div className="flex flex-col items-center gap-2 mt-2">
+                  <h3 className="text-2xl md:text-3xl font-bold text-foreground/90">{word.translation}</h3>
+                  {word.bangla && (
+                    <p className="text-3xl md:text-4xl font-bengali text-primary leading-relaxed">{word.bangla}</p>
+                  )}
+                  <div className="inline-flex items-center justify-center px-4 py-1.5 rounded-full bg-primary/5 border border-primary/10 mt-1">
+                    <p className="text-muted-foreground text-lg italic serif">/{word.transliteration}/</p>
+                  </div>
+                </div>
              </div>
         </Card>
       </div>
@@ -121,7 +128,7 @@ export default function WordDetailsPage() {
 
       {/* Contextual Examples */}
       <div className="pt-4">
-        <VerseExamples arabicWord={word.arabic} />
+        <VerseExamples arabicWord={word.arabic} banglaMeaning={word.bangla} />
       </div>
 
     </div>

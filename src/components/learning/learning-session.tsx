@@ -114,7 +114,10 @@ export default function LearningSession() {
                         examples: searchResults.map((r: any) => {
                            let translationText = '';
                            if (r.translations && r.translations.length > 0) {
-                               translationText = r.translations[0].text;
+                               translationText = r.translations[0].text
+                                   .replace(/<[^>]*>/g, '') // remove HTML
+                                   .replace(/(\d+)/g, '')   // remove numbers/footnotes
+                                   .trim();
                            } else if (r.words && r.words.length > 0) {
                                // Clean up word-by-word translation (remove brackets for smoother reading)
                                translationText = r.words
@@ -281,7 +284,7 @@ export default function LearningSession() {
   const progress = ((currentIndex) / words.length) * 100;
 
   return (
-    <div className="max-w-md mx-auto pb-8">
+    <div className="max-w-md mx-auto mb-14">
       {/* Progress Header */}
       <div className="mb-6 space-y-2">
         <div className="flex justify-between text-xs text-muted-foreground font-medium uppercase tracking-wider">

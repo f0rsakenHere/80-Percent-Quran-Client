@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Space_Grotesk, Noto_Naskh_Arabic } from "next/font/google";
+import { Space_Grotesk, Noto_Naskh_Arabic, Noto_Serif_Bengali } from "next/font/google";
 import "./globals.css";
 import "./mobile-fix.css";
 import { AuthProvider } from "@/contexts/auth-context";
@@ -17,6 +17,13 @@ const notoNaskh = Noto_Naskh_Arabic({
   subsets: ["arabic"],
   weight: ["400", "500", "600", "700"],
   variable: "--font-noto",
+  display: "swap",
+});
+
+const notoSerifBengali = Noto_Serif_Bengali({
+  subsets: ["bengali"],
+  weight: ["400", "500", "600", "700"],
+  variable: "--font-bengali",
   display: "swap",
 });
 
@@ -54,7 +61,7 @@ export default function RootLayout({
   return (
     <html lang="en" suppressHydrationWarning>
       <body
-        className={`${spaceGrotesk.variable} ${notoNaskh.variable} font-sans antialiased`}
+        className={`${spaceGrotesk.variable} ${notoNaskh.variable} ${notoSerifBengali.variable} font-sans antialiased`}
         suppressHydrationWarning
       >
         <IslamicPattern />

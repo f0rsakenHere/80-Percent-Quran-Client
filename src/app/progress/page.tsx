@@ -91,14 +91,30 @@ export default function ProgressPage() {
 
   if (loading && !stats) {
     return (
-      <div className="container max-w-lg mx-auto p-4 space-y-6">
-        <div className="grid grid-cols-2 gap-4">
-           <Skeleton className="h-32 rounded-xl" />
-           <Skeleton className="h-32 rounded-xl" />
+      <div className="w-full max-w-2xl mx-auto p-4 space-y-6">
+        {/* Header Skeleton */}
+        <div className="flex items-center gap-2">
+           <Skeleton className="h-10 w-10 rounded-full" />
+           <Skeleton className="h-8 w-40" />
         </div>
-        <Skeleton className="h-64 rounded-xl" />
-        <Skeleton className="h-20 rounded-xl" />
-        <Skeleton className="h-20 rounded-xl" />
+
+        {/* Stats Grid Skeleton */}
+        <div className="grid grid-cols-2 gap-3">
+           <Skeleton className="col-span-2 h-40 rounded-xl" />
+           <Skeleton className="h-24 rounded-xl" />
+           <Skeleton className="h-24 rounded-xl" />
+        </div>
+
+        {/* Vocabulary List Skeleton */}
+        <div className="space-y-4">
+           <div className="flex justify-between items-center">
+             <Skeleton className="h-6 w-32" />
+             <Skeleton className="h-4 w-16" />
+           </div>
+           <Skeleton className="h-24 rounded-xl" />
+           <Skeleton className="h-24 rounded-xl" />
+           <Skeleton className="h-24 rounded-xl" />
+        </div>
       </div>
     );
   }
